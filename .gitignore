@@ -82,3 +82,6 @@ target/
 
 # macOS
 .DS_Store
+
+# json files
+json_files/
