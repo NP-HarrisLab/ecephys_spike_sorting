@@ -3,21 +3,24 @@ import json
 import os
 import sys
 
-from .script_schemas import CreateInputJsonParams
+try:
+    from script_schemas import CreateInputJsonParams
+except ModuleNotFoundError:
+    from .script_schemas import CreateInputJsonParams
 
 if sys.platform == "linux":
     import pwd
 
-import importlib.util
-
 import numpy as np
 
-from .helpers import SpikeGLX_utils
+try:
+    from helpers import SpikeGLX_utils
+except ModuleNotFoundError:
+    from .helpers import SpikeGLX_utils
 
-base = importlib.util.find_spec("ecephys_spike_sorting")
-fpath = os.path.join(
-    base.submodule_search_locations[0], "scripts/create_input_json_params.json"
-)
+
+fpath = os.path.dirname(os.path.realpath(__file__))
+fpath = os.path.join(fpath, "create_input_json_params.json")
 
 schema = CreateInputJsonParams()
 with open(fpath, "r") as f:

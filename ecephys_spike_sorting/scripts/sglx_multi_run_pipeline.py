@@ -3,9 +3,14 @@ import os
 import subprocess
 import sys
 
-from .create_input_json import createInputJson
-from .helpers import SpikeGLX_utils, log_from_json, run_one_probe
-from .script_schemas import SglxMultiRunPipelineParams
+try:
+    from create_input_json import createInputJson
+    from helpers import SpikeGLX_utils, log_from_json, run_one_probe
+    from script_schemas import SglxMultiRunPipelineParams
+except ModuleNotFoundError:
+    from .create_input_json import createInputJson
+    from .helpers import SpikeGLX_utils, log_from_json, run_one_probe
+    from .script_schemas import SglxMultiRunPipelineParams
 
 # script to run CatGT, kilosort, postprocessing and TPrime on data collected using
 # SpikeGLX. The construction of the paths assumes data was saved with
