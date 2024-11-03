@@ -3,7 +3,10 @@ import shutil
 import subprocess
 import sys
 
-from . import log_from_json
+try:
+    import log_from_json
+except ModuleNotFoundError:
+    from . import log_from_json
 
 # Given json files for CatGT and modules, all processing unique to this
 # recording session and probe

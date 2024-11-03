@@ -190,6 +190,12 @@ def main(args: dict = None):
     # ----------------------
     c_Waves_snr_um = 160
 
+    # -------------------------------------------------------
+    # KS4 specific parameters -- these are the default values
+    # -------------------------------------------------------
+    ks4_duplicate_spike_ms = 0.25
+    ks4_min_template_size_um = 10
+
     # ----------------------
     # psth_events parameters
     # ----------------------
@@ -197,7 +203,7 @@ def main(args: dict = None):
     # events that should be exported with the phy output for PSTH plots
     # This funciton now happens in TPrime
     # If not using set to an empty string
-    event_ex_param_str = "xd=0,0,-1,1,50"
+    event_ex_param_str = ""  # "xd=0,0,-1,1,50"
 
     # -----------------
     # TPrime parameters

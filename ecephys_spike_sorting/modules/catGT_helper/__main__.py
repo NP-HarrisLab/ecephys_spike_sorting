@@ -32,12 +32,12 @@ def run_CatGT(args):
         print("unknown system, cannot run CatGt")
 
     # common average referencing
-    car_mode = args["catGT_helper_params"]["car_mode"]
-    if car_mode == "loccar":
-        if ["catGT_helper_params"]["useGeom"]:
-            inner_um = args["catGT_helper_params"]["loccar_inner_um"]
-            outer_um = args["catGT_helper_params"]["loccar_outer_um"]
-            car_str = " -loccar_um=" + repr(inner_um) + "," + repr(outer_um)
+    car_mode = args['catGT_helper_params']['car_mode']
+    if car_mode == 'loccar':
+        if args['catGT_helper_params']['useGeom']:
+            inner_um = args['catGT_helper_params']['loccar_inner_um']
+            outer_um = args['catGT_helper_params']['loccar_outer_um']
+            car_str = ' -loccar_um=' + repr(inner_um) + ',' + repr(outer_um)
         else:
             inner_site = args["catGT_helper_params"]["loccar_inner"]
             outer_site = args["catGT_helper_params"]["loccar_outer"]

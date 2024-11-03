@@ -96,9 +96,9 @@ def createInputJson(
     wm_spread_thresh=0.12,
     wm_site_range=16,
     qm_isi_thresh=1.5 / 1000,
-    include_pcs=True,
+    include_pcs=False,
     ks_nNeighbors_sites_fix=0,
-    ks4_duplicate_spike_bins=15,
+    ks4_duplicate_spike_ms=0.25,
     ks4_min_template_size_um=10,
 ):
 
@@ -374,25 +374,38 @@ def createInputJson(
         },
         "ks4_helper_params": {
             "do_CAR": True if ks_CAR == 0 else False,
-            "Th_universal": ks4_Th_universal,
-            "Th_learned": ks4_Th_learned,
-            "duplicate_spike_bins": ks4_duplicate_spike_bins,
-            "nblocks": ks_nblocks,
-            "sig_interp": 20.0,
-            "whitening_range": ks_whiteningRange,
-            "min_template_size": ks4_min_template_size_um,
-            "template_sizes": 5,
-            "template_from_data": True,
-            "tmin": 0,
-            "tmax": "Infinity",
-            "neareast_chans": 10,
-            "nearest_templates": 100,
-            "ccg_threshold": 0.25,
-            "acg_threshold": 0.20,
-            "ks_make_copy": ks_make_copy,
             "save_extra_vars": include_pcs,  # to save Wall and pc features
             "doFilter": ks_doFilter,  # not yet used
-            "templateSeed": ks_LTseed,  # not yet used
+            "ks_make_copy": ks_make_copy,
+            "save_preprocessed_copy": bool(ks_copy_fproc),
+            # ks4_params are limited to members of the KS4 'settings' list
+            "ks4_params": {
+                "Th_universal": ks4_Th_universal,
+                "Th_learned": ks4_Th_learned,
+                "duplicate_spike_ms": ks4_duplicate_spike_ms,
+                "nblocks": ks_nblocks,
+                "sig_interp": 20.0,
+                "whitening_range": ks_whiteningRange,
+                "min_template_size": ks4_min_template_size_um,
+                "template_sizes": 5,
+                "templates_from_data": True,
+                "nearest_chans": 10,
+                "nearest_templates": 100,
+                "ccg_threshold": 0.25,
+                "acg_threshold": 0.20,
+                "template_seed": ks_LTseed,
+                "cluster_seed": ks_CSBseed,
+            },
+        },
+        "ks_postprocessing_params": {
+            "align_avg_waveform": False,
+            "remove_duplicates": True,
+            "cWaves_path": cWaves_path,
+            "within_unit_overlap_window": 0.00017,
+            "between_unit_overlap_window": 0.00041,
+            "between_unit_dist_um": 66,
+            "deletion_mode": "lowAmpCluster",
+            "include_pcs": include_pcs,
         },
         "ks_postprocessing_params": {
             "align_avg_waveform": False,
@@ -420,12 +433,19 @@ def createInputJson(
             "snr_radius_um": c_Waves_snr_um,
             "nAP": nAP,
         },
-        "noise_waveform_params": {
-            "classifier_path": os.path.join(
-                modules_directory, "noise_templates", "rf_classifier.pkl"
-            ),
-            "use_random_forest": noise_template_use_rf,
-            "peak_channel_range_um": 150,
+        "quality_metrics_params": {
+            "isi_threshold": qm_isi_thresh,
+            "min_isi": 0.000166,
+            "tbin_sec": 0.001,
+            "max_radius_um": 68,
+            "max_spikes_for_unit": 500,
+            "max_spikes_for_nn": 10000,
+            "n_neighbors": 4,
+            "n_silhouette": 10000,
+            "drift_metrics_interval_s": 51,
+            "drift_metrics_min_spikes_per_interval": 10,
+            "include_pcs": include_pcs,
+            "include_ibl": True,
         },
         "quality_metrics_params": {
             "isi_threshold": qm_isi_thresh,
