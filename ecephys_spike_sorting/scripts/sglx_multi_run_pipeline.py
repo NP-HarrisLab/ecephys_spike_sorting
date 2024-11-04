@@ -449,7 +449,7 @@ def main(args: dict = None):
                 event_ex_param_str=event_ex_param_str,
                 c_Waves_snr_um=c_Waves_snr_um,
                 qm_isi_thresh=refPerMS / 1000,
-                ks4_duplicate_spike_bins=ks4_duplicate_spike_bins,
+                ks4_duplicate_spike_ms=ks4_duplicate_spike_ms,
                 ks4_min_template_size_um=ks4_min_template_size_um,
             )
 
