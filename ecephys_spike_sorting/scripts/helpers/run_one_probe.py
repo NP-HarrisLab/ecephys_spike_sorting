@@ -40,9 +40,13 @@ def runOne(
     # if we are running any modules
     # copy module json file to data directory as record of the input parameters
     if len(modules) > 0:
-        shutil.copy(
-            module_input_json, os.path.join(data_directory, session_id + "-input.json")
-        )
+        try:
+            shutil.copy(
+                module_input_json,
+                os.path.join(data_directory, session_id + "-input.json"),
+            )
+        except FileNotFoundError:
+            print("Could not copy module input json file to data directory")
 
     for module in modules:
         output_json = os.path.join(

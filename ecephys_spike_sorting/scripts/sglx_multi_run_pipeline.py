@@ -6,11 +6,12 @@ import sys
 try:
     from create_input_json import createInputJson
     from helpers import SpikeGLX_utils, log_from_json, run_one_probe
-    from script_schemas import SglxMultiRunPipelineParams
+
+    from ecephys_spike_sorting.scripts.schemas import SglxMultiRunPipelineParams
 except ModuleNotFoundError:
     from .create_input_json import createInputJson
     from .helpers import SpikeGLX_utils, log_from_json, run_one_probe
-    from .script_schemas import SglxMultiRunPipelineParams
+    from .schemas import SglxMultiRunPipelineParams
 
 # script to run CatGT, kilosort, postprocessing and TPrime on data collected using
 # SpikeGLX. The construction of the paths assumes data was saved with
@@ -394,10 +395,18 @@ def main(args: dict = None):
             run_str = spec[0] + "_g" + str(first_gate)
             run_folder = "catgt_" + run_str
             prb_folder = run_str + "_imec" + prb
-            data_directory.append(os.path.join(catGT_dest, run_folder, prb_folder))
+            data_dir = os.path.join(catGT_dest, run_folder, prb_folder)
             fileName = run_str + "_tcat.imec" + prb + ".ap.bin"
-            continuous_file = os.path.join(data_directory[i], fileName)
+            continuous_file = os.path.join(data_dir, fileName)
 
+            if not os.path.exists(continuous_file):
+                run_folder = run_str
+                prb_folder = run_str + "_imec" + prb
+                data_dir = os.path.join(npx_directory, run_folder, prb_folder)
+                fileName = f"{run_str}_t0.imec{prb}.ap.bin"
+                continuous_file = os.path.join(data_dir, fileName)
+
+            data_directory.append(data_dir)
             outputName = "imec" + prb + "_" + ks_output_tag
 
             # kilosort_postprocessing and noise_templates moduules alter the files

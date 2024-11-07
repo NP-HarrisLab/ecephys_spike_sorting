@@ -4,9 +4,9 @@ import os
 import sys
 
 try:
-    from script_schemas import CreateInputJsonParams
+    from ecephys_spike_sorting.scripts.schemas import CreateInputJsonParams
 except ModuleNotFoundError:
-    from .script_schemas import CreateInputJsonParams
+    from .schemas import CreateInputJsonParams
 
 if sys.platform == "linux":
     import pwd
@@ -407,16 +407,6 @@ def createInputJson(
             "deletion_mode": "lowAmpCluster",
             "include_pcs": include_pcs,
         },
-        "ks_postprocessing_params": {
-            "align_avg_waveform": False,
-            "remove_duplicates": True,
-            "cWaves_path": cWaves_path,
-            "within_unit_overlap_window": 0.00017,
-            "between_unit_overlap_window": 0.00041,
-            "between_unit_dist_um": 66,
-            "deletion_mode": "lowAmpCluster",
-            "include_pcs": include_pcs,
-        },
         "mean_waveform_params": {
             "mean_waveforms_file": os.path.join(
                 kilosort_output_directory, "mean_waveforms.npy"
@@ -433,19 +423,12 @@ def createInputJson(
             "snr_radius_um": c_Waves_snr_um,
             "nAP": nAP,
         },
-        "quality_metrics_params": {
-            "isi_threshold": qm_isi_thresh,
-            "min_isi": 0.000166,
-            "tbin_sec": 0.001,
-            "max_radius_um": 68,
-            "max_spikes_for_unit": 500,
-            "max_spikes_for_nn": 10000,
-            "n_neighbors": 4,
-            "n_silhouette": 10000,
-            "drift_metrics_interval_s": 51,
-            "drift_metrics_min_spikes_per_interval": 10,
-            "include_pcs": include_pcs,
-            "include_ibl": True,
+        "noise_waveform_params": {
+            "classifier_path": os.path.join(
+                modules_directory, "noise_templates", "rf_classifier.pkl"
+            ),
+            "use_random_forest": noise_template_use_rf,
+            "peak_channel_range_um": 150,
         },
         "quality_metrics_params": {
             "isi_threshold": qm_isi_thresh,
@@ -459,7 +442,7 @@ def createInputJson(
             "drift_metrics_interval_s": 51,
             "drift_metrics_min_spikes_per_interval": 10,
             "include_pcs": include_pcs,
-            "include_ibl": False,
+            "include_ibl": True,  # changed to True
         },
         "catGT_helper_params": {
             "run_name": catGT_run_name,

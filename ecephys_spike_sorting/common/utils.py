@@ -1,16 +1,15 @@
-import pandas as pd
-import os
-import numpy as np
 import json
+import os
+import pathlib
 import sys
 import time
-import pathlib
 
+import numpy as np
+import pandas as pd
 from git import Repo
 
 
-def find_range(x,a,b,option='within'):
-    
+def find_range(x, a, b, option="within"):
     """
     Find indices of data within or outside range [a,b]
 
@@ -32,16 +31,15 @@ def find_range(x,a,b,option='within'):
 
     """
 
-    if option=='within':
-        return np.where(np.logical_and(x>=a, x<=b))[0]
-    elif option=='outside':
+    if option == "within":
+        return np.where(np.logical_and(x >= a, x <= b))[0]
+    elif option == "outside":
         return np.where(np.logical_or(x < a, x > b))[0]
     else:
-        raise ValueError('unrecognized option paramter: {}'.format(option))
+        raise ValueError("unrecognized option paramter: {}".format(option))
 
 
 def rms(data):
-
     """
     Computes root-mean-squared voltage of a signal
 
@@ -52,13 +50,15 @@ def rms(data):
     Output:
     ------
     rms_value - float
-    
+
     """
 
-    return np.power(np.mean(np.power(data.astype('float32'),2)),0.5)
+    return np.power(np.mean(np.power(data.astype("float32"), 2)), 0.5)
 
-def write_probe_json(output_file, surface_channel, air_channel, vertical_pos, horizontal_pos, shank_ind):
 
+def write_probe_json(
+    output_file, surface_channel, air_channel, vertical_pos, horizontal_pos, shank_ind
+):
     """
     Writes a json file containing information about one Neuropixels probe.
 
@@ -89,26 +89,26 @@ def write_probe_json(output_file, surface_channel, air_channel, vertical_pos, ho
 
     """
 
-    with open(output_file, 'w') as outfile:
-        json.dump( 
-                  {  
-#                        'channel' : channels.tolist(), 
-#                        'offset' : offset.tolist(), 
-#                        'scaling' : scaling.tolist(), 
-#                        'mask' : mask.tolist(), 
-                        'surface_y' : surface_channel, 
-                        'air_y' : air_channel,
-                        'vertical_pos' : vertical_pos.tolist(),
-                        'horizontal_pos' : horizontal_pos.tolist(),
-                        'shank_index' : shank_ind.tolist()
-                   },
-                 
-                  outfile, 
-                  indent = 4, separators = (',', ': ') 
-                 ) 
+    with open(output_file, "w") as outfile:
+        json.dump(
+            {
+                #                        'channel' : channels.tolist(),
+                #                        'offset' : offset.tolist(),
+                #                        'scaling' : scaling.tolist(),
+                #                        'mask' : mask.tolist(),
+                "surface_y": surface_channel,
+                "air_y": air_channel,
+                "vertical_pos": vertical_pos.tolist(),
+                "horizontal_pos": horizontal_pos.tolist(),
+                "shank_index": shank_ind.tolist(),
+            },
+            outfile,
+            indent=4,
+            separators=(",", ": "),
+        )
+
 
 def read_probe_json(input_file):
-
     """
     Reads a json file containing information about one Neuropixels probe.
 
@@ -131,21 +131,22 @@ def read_probe_json(input_file):
         Index of channel at interface between saline/agar and air
 
     """
-    
+
     with open(input_file) as data_file:
         data = json.load(data_file)
-    
-    scaling = np.array(data['scaling'])
-    mask = np.array(data['mask'])
-    offset = np.array(data['offset'])
-    surface_channel = data['surface_channel']
-    air_channel = data['air_channel']
+
+    scaling = np.array(data["scaling"])
+    mask = np.array(data["mask"])
+    offset = np.array(data["offset"])
+    surface_channel = data["surface_channel"]
+    air_channel = data["air_channel"]
 
     return mask, offset, scaling, surface_channel, air_channel
 
 
-def write_cluster_group_tsv(IDs, quality, output_directory, filename = 'cluster_group.tsv'):
-
+def write_cluster_group_tsv(
+    IDs, quality, output_directory, filename="cluster_group.tsv"
+):
     """
     Writes a tab-separated cluster_group.tsv file
 
@@ -163,16 +164,15 @@ def write_cluster_group_tsv(IDs, quality, output_directory, filename = 'cluster_
     cluster_group.tsv (written to disk)
 
     """
-       
-    df = pd.DataFrame(data={'cluster_id' : IDs, 'group': quality})
-    
-    print('Saving data...')
-    
-    df.to_csv(os.path.join(output_directory, filename), sep='\t', index=False)
+
+    df = pd.DataFrame(data={"cluster_id": IDs, "group": quality})
+
+    print("Saving data...")
+
+    df.to_csv(os.path.join(output_directory, filename), sep="\t", index=False)
 
 
 def read_cluster_group_tsv(filename):
-
     """
     Reads a tab-separated cluster_group.tsv file from disk
 
@@ -190,14 +190,14 @@ def read_cluster_group_tsv(filename):
 
     """
 
-    info = np.genfromtxt(filename, dtype='str')
-    cluster_ids = info[1:,0].astype('int')
-    cluster_quality = info[1:,1]
+    info = np.genfromtxt(filename, dtype="str")
+    cluster_ids = info[1:, 0].astype("int")
+    cluster_quality = info[1:, 1]
 
     return cluster_ids, cluster_quality
 
+
 def read_cluster_amplitude_tsv(filename):
-    
     """
     Reads a tab-separated cluster_Amplitude.tsv file from disk
 
@@ -212,17 +212,16 @@ def read_cluster_amplitude_tsv(filename):
         array of average cluster amplitudes calculated by KS2
 
     """
-    info = np.genfromtxt(filename, dtype='str')
-    # don't return cluster_ids because those are already read in or 
+    info = np.genfromtxt(filename, dtype="str")
+    # don't return cluster_ids because those are already read in or
     # derived from the spike_clusters.npy file
     # cluster_ids = info[1:,0].astype('int')
-    cluster_amplitude = info[1:,1].astype('float')
-
+    cluster_amplitude = info[1:, 1].astype("float")
 
     return cluster_amplitude
 
-def load(folder, filename):
 
+def load(folder, filename):
     """
     Loads a numpy file from a folder.
 
@@ -243,13 +242,14 @@ def load(folder, filename):
     return np.load(os.path.join(folder, filename))
 
 
-def load_kilosort_data(folder, 
-                       sample_rate = None, 
-                       convert_to_seconds = True, 
-                       use_master_clock = False, 
-                       include_pcs = False,
-                       template_zero_padding= 21):
-
+def load_kilosort_data(
+    folder,
+    sample_rate=None,
+    convert_to_seconds=True,
+    use_master_clock=False,
+    include_pcs=False,
+    template_zero_padding=21,
+):
     """
     Loads Kilosort output files from a directory
 
@@ -278,7 +278,7 @@ def load_kilosort_data(folder,
         Template IDs for N spikes
     amplitudes : numpy.ndarray (N x 0)
         Amplitudes for N spikes
-    unwhitened_temps : numpy.ndarray (M x samples x channels) 
+    unwhitened_temps : numpy.ndarray (M x samples x channels)
         Templates for M units
     channel_map : numpy.ndarray
         Channels from original data file used for sorting
@@ -300,94 +300,118 @@ def load_kilosort_data(folder,
     """
 
     if use_master_clock:
-        spike_times = load(folder,'spike_times_master_clock.npy')
+        spike_times = load(folder, "spike_times_master_clock.npy")
     else:
-        spike_times = load(folder,'spike_times.npy')
-        
-    spike_clusters = load(folder,'spike_clusters.npy')
-    spike_templates = load(folder, 'spike_templates.npy')
-    amplitudes = load(folder,'amplitudes.npy')
-    templates = load(folder,'templates.npy')
-    unwhitening_mat = load(folder,'whitening_mat_inv.npy')
-    channel_map = load(folder, 'channel_map.npy')
-    channel_pos = load(folder, 'channel_positions.npy')
+        spike_times = load(folder, "spike_times.npy")
+
+    spike_clusters = load(folder, "spike_clusters.npy")
+    spike_templates = load(folder, "spike_templates.npy")
+    amplitudes = load(folder, "amplitudes.npy")
+    templates = load(folder, "templates.npy")
+    unwhitening_mat = load(folder, "whitening_mat_inv.npy")
+    channel_map = load(folder, "channel_map.npy")
+    channel_pos = load(folder, "channel_positions.npy")
 
     if include_pcs:
-        pc_features = load(folder, 'pc_features.npy')
-        pc_feature_ind = load(folder, 'pc_feature_ind.npy')
-        if os.path.isfile(os.path.join(folder, 'template_features.npy')):
-            template_features = load(folder, 'template_features.npy') 
+        pc_features = load(folder, "pc_features.npy")
+        pc_feature_ind = load(folder, "pc_feature_ind.npy")
+        if os.path.isfile(os.path.join(folder, "template_features.npy")):
+            template_features = load(folder, "template_features.npy")
         else:
             template_features = np.asarray([])
 
     # fix any nans in templates
     if np.sum(np.isnan(templates)):
         templates = np.nan_to_num(templates)
-        np.save(os.path.join(folder,'templates.npy'),templates)
-    
-     # zero padding differs between sort versions, so derive from the
+        np.save(os.path.join(folder, "templates.npy"), templates)
+
+    # zero padding differs between sort versions, so derive from the
     # values in the templates
-    s1 = np.nansum(templates,axis=0)
-    s2 = np.nansum(s1,axis=1)
-    wz = np.where(s2==0)
-    if np.any(wz[0]):       
+    s1 = np.nansum(templates, axis=0)
+    s2 = np.nansum(s1, axis=1)
+    wz = np.where(s2 == 0)
+    if np.any(wz[0]):
         template_zero_padding = np.max(wz) + 1
-        print('template zero padding: ' + repr(template_zero_padding))
-        templates = templates[:,template_zero_padding:,:] # remove zeros
-        
-    spike_clusters = np.squeeze(spike_clusters) # fix dimensions
-    spike_times = np.squeeze(spike_times)# fix dimensions
+        print("template zero padding: " + repr(template_zero_padding))
+        templates = templates[:, template_zero_padding:, :]  # remove zeros
+
+    spike_clusters = np.squeeze(spike_clusters)  # fix dimensions
+    spike_times = np.squeeze(spike_times)  # fix dimensions
 
     if convert_to_seconds and sample_rate is not None:
-       spike_times = spike_times / sample_rate 
-                    
+        spike_times = spike_times / sample_rate
+
     unwhitened_temps = np.zeros((templates.shape))
-    
+
     for temp_idx in range(templates.shape[0]):
-        
-        unwhitened_temps[temp_idx,:,:] = np.dot(np.ascontiguousarray(templates[temp_idx,:,:]),np.ascontiguousarray(unwhitening_mat))
-    
-    # removed option to read cluster_ids from cluster_group_tsv because this file is changed by phy.                
+
+        unwhitened_temps[temp_idx, :, :] = np.dot(
+            np.ascontiguousarray(templates[temp_idx, :, :]),
+            np.ascontiguousarray(unwhitening_mat),
+        )
+
+    # removed option to read cluster_ids from cluster_group_tsv because this file is changed by phy.
     # try:
     #     cluster_ids, cluster_quality = read_cluster_group_tsv(os.path.join(folder, 'cluster_group.tsv'))
     # except OSError:
     cluster_ids = np.unique(spike_clusters)
-    cluster_quality = ['unsorted'] * cluster_ids.size
-        
-    cluster_amplitude = read_cluster_amplitude_tsv(os.path.join(folder, 'cluster_Amplitude.tsv'))
-    
+    cluster_quality = ["unsorted"] * cluster_ids.size
+
+    cluster_amplitude = read_cluster_amplitude_tsv(
+        os.path.join(folder, "cluster_Amplitude.tsv")
+    )
+
     # check that cluster_amplitude has the same number of entries as templates
     # if highest index units have no spikes, they will not have an entry in cluster_Amplitudes.tsv
     diff = templates.shape[0] - cluster_amplitude.size
     if diff > 0:
         pad = np.zeros((diff,))
-        cluster_amplitude = np.append(cluster_amplitude,pad)
-        
-
-        
-        
+        cluster_amplitude = np.append(cluster_amplitude, pad)
 
     if not include_pcs:
-        return spike_times, spike_clusters, spike_templates, amplitudes, unwhitened_temps, \
-               channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude
+        return (
+            spike_times,
+            spike_clusters,
+            spike_templates,
+            amplitudes,
+            unwhitened_temps,
+            channel_map,
+            channel_pos,
+            cluster_ids,
+            cluster_quality,
+            cluster_amplitude,
+        )
     else:
-        return spike_times, spike_clusters, spike_templates, amplitudes, unwhitened_temps, \
-               channel_map, channel_pos, cluster_ids, cluster_quality, cluster_amplitude, \
-               pc_features, pc_feature_ind, template_features
+        return (
+            spike_times,
+            spike_clusters,
+            spike_templates,
+            amplitudes,
+            unwhitened_temps,
+            channel_map,
+            channel_pos,
+            cluster_ids,
+            cluster_quality,
+            cluster_amplitude,
+            pc_features,
+            pc_feature_ind,
+            template_features,
+        )
 
 
-def get_spike_depths(spike_clusters, unit_template_ids, first_pc_sq, pc_feature_ind, channel_pos):
-
+def get_spike_depths(
+    spike_clusters, unit_template_ids, first_pc_sq, pc_feature_ind, channel_pos
+):
     """
     Calculates the distance (in microns) of individual spikes from the probe tip
 
     This implementation is based on Matlab code from github.com/cortex-lab/spikes
-    
-    Needs to be called for a subset of spikes extracted with the majority template 
+
+    Needs to be called for a subset of spikes extracted with the majority template
     This is true for all spikes in data which has not been curated.
     Manual merges create clusters that derive from multiple templats, but this
     algorthim examines features from a single template -- so we select spikes
-    for each cluster that were extracted with the majority template before calling 
+    for each cluster that were extracted with the majority template before calling
     in metrics.py
 
     Input:
@@ -410,7 +434,7 @@ def get_spike_depths(spike_clusters, unit_template_ids, first_pc_sq, pc_feature_
         Distance (in microns) from each spike waveform from the probe tip
 
     """
-    
+
     # Need to make a copy of pc_features (which can be up to 20G for a very long run)
     # to avoid changing the original (python passes by reference)
     # to help with memory use:
@@ -418,22 +442,21 @@ def get_spike_depths(spike_clusters, unit_template_ids, first_pc_sq, pc_feature_
     # take the element-wise power in place to avoid making a 2nd copy
 
     # get values of the 1st pc for each template site for each spike
-#    pc_power = np.copy(pc_features[:,0,:])
-#
-#    # zero out negtaive elements
-#    pc_power[pc_power < 0] = 0
-#
-#    pc_power = pow(pc_power, 2) # element by element square
-  
+    #    pc_power = np.copy(pc_features[:,0,:])
+    #
+    #    # zero out negtaive elements
+    #    pc_power[pc_power < 0] = 0
+    #
+    #    pc_power = pow(pc_power, 2) # element by element square
+
     spike_feat_ind = pc_feature_ind[unit_template_ids[spike_clusters], :]
     spike_feat_ycoord = channel_pos[spike_feat_ind, 1]
-    spike_depths = np.sum(spike_feat_ycoord * first_pc_sq, 1) / np.sum(first_pc_sq,1)
+    spike_depths = np.sum(spike_feat_ycoord * first_pc_sq, 1) / np.sum(first_pc_sq, 1)
 
     return spike_depths
 
 
 def get_spike_amplitudes(spike_templates, templates, amplitudes):
-
     """
     Calculates the amplitude of individual spikes, based on the original template
     plus a scaling factor
@@ -444,7 +467,7 @@ def get_spike_amplitudes(spike_templates, templates, amplitudes):
     -------
     spike_templates : numpy.ndarray (N x 0)
         Template IDs for N spikes
-    templates : numpy.ndarray (M x samples x channels) 
+    templates : numpy.ndarray (M x samples x channels)
         Unwhitened templates for M units
     amplitudes : numpy.ndarray (N x 0)
         Amplitudes for N spikes
@@ -456,16 +479,14 @@ def get_spike_amplitudes(spike_templates, templates, amplitudes):
 
     """
 
-    template_amplitudes = np.max(np.max(templates,1) - np.min(templates,1),1)
+    template_amplitudes = np.max(np.max(templates, 1) - np.min(templates, 1), 1)
 
     spike_amplitudes = template_amplitudes[spike_templates] * amplitudes
 
     return np.squeeze(spike_amplitudes)
 
 
-
 def get_repo_commit_date_and_hash(repo_location):
-
     """
     Finds the date and hash of the latest commit in a git repository
 
@@ -487,19 +508,22 @@ def get_repo_commit_date_and_hash(repo_location):
         try:
             repo = Repo(repo_location)
             headcommit = repo.head.commit
-            commit_date = time.strftime("%a, %d %b %Y %H:%M", time.gmtime(headcommit.committed_date))
+            commit_date = time.strftime(
+                "%a, %d %b %Y %H:%M", time.gmtime(headcommit.committed_date)
+            )
             commit_hash = headcommit.hexsha
         except:
-            commit_date = 'repository not available'
-            commit_hash = 'repository not available'
+            commit_date = "repository not available"
+            commit_hash = "repository not available"
     else:
-        print('Invalid path to kilosort.')
+        print("Invalid path to kilosort.")
 
     return commit_date, commit_hash
 
 
-def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 0, length = 40, fill = '▒'):
-    
+def printProgressBar(
+    iteration, total, prefix="", suffix="", decimals=0, length=40, fill="▒"
+):
     """
     Call in a loop to create terminal progress bar
 
@@ -525,18 +549,19 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 0, l
     Outputs:
     --------
     None
-    
+
     """
-    
+
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '░' * (length - filledLength)
-    sys.stdout.write('\r%s %s %s%% %s' % (prefix, bar, percent, suffix))
+    bar = fill * filledLength + "░" * (length - filledLength)
+    sys.stdout.write("\r%s %s %s%% %s" % (prefix, bar, percent, suffix))
     sys.stdout.flush()
 
-    if iteration == total: 
+    if iteration == total:
         print()
-  
+
+
 def catGT_ex_params_from_str(ex_str):
     # starting from the comma delimeted CatGT string, return extraction
     # parameters.
@@ -545,150 +570,167 @@ def catGT_ex_params_from_str(ex_str):
     # <run name>_g<gate index>_tcat.nidq.<ex_name_str>.txt
     # for imec SY channels, the file of of extracted edges will be named:
     # <run name>_g<gate index>_tcat.imec<probe index>.txt
-    
-    # CatGT does not allow any spaces wihtin options, but there can be 
+
+    # CatGT does not allow any spaces wihtin options, but there can be
     # spaces between options in the command string, and these are
-    # appended to the comma delimited string parsed here. 
+    # appended to the comma delimited string parsed here.
     # Remove spaces before parsing
     # stream names for each js
     stream_name = []
-    stream_name.append('nidq')
-    stream_name.append('obx')
-    stream_name.append('imec')
+    stream_name.append("nidq")
+    stream_name.append("obx")
+    stream_name.append("imec")
     stream_fileid = []
-    stream_fileid.append('.nidq.')
-    stream_fileid.append('.obx.')
-    stream_fileid.append('.ap.')
-    
-    ex_str = ex_str.replace(' ','') #replace any spare spaces with commas
-    
-    eq_pos = ex_str.find('=')
-    ex_type = ex_str[0:eq_pos]    # stream type (SY, iSY, XD, iXD, i)
-    ex_parts = ex_str[eq_pos+1:].split(',')
-    
-    if 'x' in ex_type:
+    stream_fileid.append(".nidq.")
+    stream_fileid.append(".obx.")
+    stream_fileid.append(".ap.")
+
+    ex_str = ex_str.replace(" ", "")  # replace any spare spaces with commas
+
+    eq_pos = ex_str.find("=")
+    ex_type = ex_str[0:eq_pos]  # stream type (SY, iSY, XD, iXD, i)
+    ex_parts = ex_str[eq_pos + 1 :].split(",")
+
+    if "x" in ex_type:
         # CatGT 3.0 or later
         stream_index = int(ex_parts[0])
         prb_index = int(ex_parts[1])
-        if 'd' in ex_type:
+        if "d" in ex_type:
             # name string = x(i)d_<word>_<bit>_<pulse length>
             # if the pulse length includes a decimal, reformat
-            ex_parts[4] = ex_parts[4].replace('.', 'p')
+            ex_parts[4] = ex_parts[4].replace(".", "p")
             # if word = -1, replace with wildcard character
-            if ex_parts[2] == '-1':
-                ex_parts[2] = '*'
-            ex_name_str = ex_type + '_' + ex_parts[2] + '_' + ex_parts[3] + '_' + ex_parts[4]
+            if ex_parts[2] == "-1":
+                ex_parts[2] = "*"
+            ex_name_str = (
+                ex_type + "_" + ex_parts[2] + "_" + ex_parts[3] + "_" + ex_parts[4]
+            )
         else:
             # edges from analog, xa or xia
             # name string = x(i)_word_<pulse_length>
-            ex_parts[3] = ex_parts[5].replace('.', 'p')
-            ex_name_str = ex_type + '_' + ex_parts[2] + '_' + ex_parts[5]
+            ex_parts[3] = ex_parts[5].replace(".", "p")
+            ex_name_str = ex_type + "_" + ex_parts[2] + "_" + ex_parts[5]
         if stream_index == 0:
             ex_name_str = stream_fileid[0] + ex_name_str
         else:
-            ex_name_str = stream_name[stream_index] + repr(prb_index) + stream_fileid[stream_index] + ex_name_str
+            ex_name_str = (
+                stream_name[stream_index]
+                + repr(prb_index)
+                + stream_fileid[stream_index]
+                + ex_name_str
+            )
     else:
         # CatGT 2.5-like
-        prb_index = 0      # for NI 
-        if ex_type == 'SY' or ex_type == 'iSY':
+        prb_index = 0  # for NI
+        if ex_type == "SY" or ex_type == "iSY":
             # name string = SY_<word>_<bit>_<pulse length>
             # if the pulse length includes a decimal, reformat
             stream_index = 2
             prb_index = int(ex_parts[0])
-            ex_parts[3] = ex_parts[3].replace('.', 'p')
+            ex_parts[3] = ex_parts[3].replace(".", "p")
             # if word = -1, replace with wildcard character
-            if ex_parts[1] == '-1':
-                ex_parts[1] = '*'
-            ex_name_str = ex_type + '_' + ex_parts[1] + '_' + ex_parts[2] + '_' + ex_parts[3]
-        elif ex_type == 'XD' or ex_type == 'iXD':
+            if ex_parts[1] == "-1":
+                ex_parts[1] = "*"
+            ex_name_str = (
+                ex_type + "_" + ex_parts[1] + "_" + ex_parts[2] + "_" + ex_parts[3]
+            )
+        elif ex_type == "XD" or ex_type == "iXD":
             # name string = XD_<word>_<bit>_<pulse length>
             # if the pulse length includes a decimal, reformat
-            ex_parts[2] = ex_parts[2].replace('.', 'p')
+            ex_parts[2] = ex_parts[2].replace(".", "p")
             # if word = -1, replace with wildcard character
-            if ex_parts[0] == '-1':
-                ex_parts[0] = '*'
-            ex_name_str = ex_type + '_' + ex_parts[0] + '_' + ex_parts[1] + '_' + ex_parts[2]
+            if ex_parts[0] == "-1":
+                ex_parts[0] = "*"
+            ex_name_str = (
+                ex_type + "_" + ex_parts[0] + "_" + ex_parts[1] + "_" + ex_parts[2]
+            )
         else:
             # XA or iXA
             # name string = XA_<word>_<pulse length>
             # if the pulse length includes a decimal, reformat
-            ex_parts[3] = ex_parts[3].replace('.', 'p')
-            ex_name_str = ex_type + '_' + ex_parts[0] + '_' + ex_parts[3]
+            ex_parts[3] = ex_parts[3].replace(".", "p")
+            ex_name_str = ex_type + "_" + ex_parts[0] + "_" + ex_parts[3]
 
     return ex_type, stream_index, prb_index, ex_name_str
+
 
 def getSortResults(output_dir, clu_version):
     # load results from phy for run logging and creation of the table for C_Waves
 
-    cluLabel = np.load(os.path.join(output_dir, 'spike_clusters.npy'))
-    spkTemplate = np.load(os.path.join(output_dir,'spike_templates.npy'))
+    cluLabel = np.load(os.path.join(output_dir, "spike_clusters.npy"))
+    spkTemplate = np.load(os.path.join(output_dir, "spike_templates.npy"))
     cluLabel = np.squeeze(cluLabel)
     spkTemplate = np.squeeze(spkTemplate)
 
-    unqLabel, labelCounts = np.unique(cluLabel, return_counts = True)
+    unqLabel, labelCounts = np.unique(cluLabel, return_counts=True)
     nTot = cluLabel.shape[0]
     nLabel = unqLabel.shape[0]
     maxLabel = np.max(unqLabel)
 
-    templates = np.load(os.path.join(output_dir, 'templates.npy'))
-    channel_map = np.load(os.path.join(output_dir, 'channel_map.npy'))
+    templates = np.load(os.path.join(output_dir, "templates.npy"))
+    channel_map = np.load(os.path.join(output_dir, "channel_map.npy"))
     channel_map = np.squeeze(channel_map)
-    
+
     # read in inverse of whitening matrix
-    w_inv = np.load((os.path.join(output_dir, 'whitening_mat_inv.npy')))
+    w_inv = np.load((os.path.join(output_dir, "whitening_mat_inv.npy")))
     nTemplate = templates.shape[0]
-    
+
     # initialize peak_channels array
-    peak_channels = np.zeros([nLabel,],'uint32')
-    
-   
+    peak_channels = np.zeros(
+        [
+            nLabel,
+        ],
+        "uint32",
+    )
+
     # After manual splits or merges, some labels will have spikes found with
     # different templats.
     # for each label in the list unqLabel, get the most common template
-    # For that template (nt x nchan), multiply the the transpose (nchan x nt) by inverse of 
+    # For that template (nt x nchan), multiply the the transpose (nchan x nt) by inverse of
     # the whitening matrix (nchan x nchan); get max and min along tthe time axis (1)
     # to find the peak channel
-    for i in np.arange(0,nLabel):
-        curr_spkTemplate = spkTemplate[np.where(cluLabel==unqLabel[i])]
+    for i in np.arange(0, nLabel):
+        curr_spkTemplate = spkTemplate[np.where(cluLabel == unqLabel[i])]
         template_mode = np.argmax(np.bincount(curr_spkTemplate))
-        currT = templates[template_mode,:].T
+        currT = templates[template_mode, :].T
         curr_unwh = np.matmul(w_inv, currT)
-        currdiff = np.max(curr_unwh,1) - np.min(curr_unwh,1)
+        currdiff = np.max(curr_unwh, 1) - np.min(curr_unwh, 1)
         peak_channels[i] = channel_map[np.argmax(currdiff)]
 
-    clus_Table = np.zeros((maxLabel+1, 2), dtype='uint32')
+    clus_Table = np.zeros((maxLabel + 1, 2), dtype="uint32")
     clus_Table[unqLabel, 0] = labelCounts
     clus_Table[unqLabel, 1] = peak_channels
 
     if clu_version == 0:
-        np.save(os.path.join(output_dir, 'clus_Table.npy'), clus_Table)
+        np.save(os.path.join(output_dir, "clus_Table.npy"), clus_Table)
     else:
-        clu_Name = 'clus_Table_' + repr(clu_version) + '.npy'
+        clu_Name = "clus_Table_" + repr(clu_version) + ".npy"
         np.save(os.path.join(output_dir, clu_Name), clus_Table)
- 
+
     return nTemplate, nTot
 
-def getFileVersion(input_filePath):
-    
+
+# default to overwriting metrics.csv file
+def getFileVersion(input_filePath, overwrite=True):
+
     # arting from the base path name givin in the parameters
     # also return name for next file in series = next_file
     # If no file exists yet, return curr_file = 'none', new_file = input
-    
-    next_version = 0;
+
+    next_version = 0
     next_file = input_filePath
-    
-    if os.path.exists(next_file):
+
+    if os.path.exists(next_file) and not overwrite:
         # loop over up to 20 versions with an added _1, _2 ...etc
         outPath = pathlib.Path(input_filePath).parent
         outName = pathlib.Path(input_filePath).stem
         outExt = pathlib.Path(input_filePath).suffix
-        for version_idx in range(1,21):
-            nextName = outName + '_' + repr(version_idx) + outExt
+        for version_idx in range(1, 21):
+            nextName = outName + "_" + repr(version_idx) + outExt
             next_file = os.path.join(outPath, nextName)
             if os.path.exists(next_file) is False:
-                #break out of loop 
+                # break out of loop
                 next_version = version_idx
                 break
-    
 
     return next_file, next_version

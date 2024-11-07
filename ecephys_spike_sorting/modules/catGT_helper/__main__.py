@@ -32,12 +32,12 @@ def run_CatGT(args):
         print("unknown system, cannot run CatGt")
 
     # common average referencing
-    car_mode = args['catGT_helper_params']['car_mode']
-    if car_mode == 'loccar':
-        if args['catGT_helper_params']['useGeom']:
-            inner_um = args['catGT_helper_params']['loccar_inner_um']
-            outer_um = args['catGT_helper_params']['loccar_outer_um']
-            car_str = ' -loccar_um=' + repr(inner_um) + ',' + repr(outer_um)
+    car_mode = args["catGT_helper_params"]["car_mode"]
+    if car_mode == "loccar":
+        if args["catGT_helper_params"]["useGeom"]:
+            inner_um = args["catGT_helper_params"]["loccar_inner_um"]
+            outer_um = args["catGT_helper_params"]["loccar_outer_um"]
+            car_str = " -loccar_um=" + repr(inner_um) + "," + repr(outer_um)
         else:
             inner_site = args["catGT_helper_params"]["loccar_inner"]
             outer_site = args["catGT_helper_params"]["loccar_outer"]
@@ -110,9 +110,14 @@ def run_CatGT(args):
     catgt_runDir = os.path.join(
         args["directories"]["extracted_data_directory"], catgt_runName
     )
-    shutil.copyfile(
-        os.path.join(logPath, logName), os.path.join(catgt_runDir, catgt_logName)
-    )
+    try:
+        shutil.copyfile(
+            os.path.join(logPath, logName), os.path.join(catgt_runDir, catgt_logName)
+        )
+    except OSError:
+        print(
+            f"copy of CatGT log file {os.path.join(logPath, logName), os.path.join(catgt_runDir, catgt_logName)} failed"
+        )
 
     # if an fyi file was created, check if there is aleady an 'all_fyi.txt'
     run_name = args["catGT_helper_params"]["run_name"] + "_g" + str(first_gate)
