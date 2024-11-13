@@ -4,8 +4,8 @@ import subprocess
 import sys
 
 try:
-    from create_input_json import createInputJson
-    from helpers import SpikeGLX_utils, log_from_json, run_one_probe
+    from create_input_json import createInputJson  # type: ignore
+    from helpers import SpikeGLX_utils, log_from_json, run_one_probe  # type: ignore
 
     from ecephys_spike_sorting.scripts.schemas import SglxMultiRunPipelineParams
 except ModuleNotFoundError:
@@ -104,7 +104,6 @@ def main(args: dict = None):
     #   brain regions, list of strings, one per probe, to set region specific params
     #           these strings must match a key in the param dictionaries above.
 
-    # TODO process probes
     run_specs = [
         [
             params["run_name"],
@@ -176,7 +175,7 @@ def main(args: dict = None):
     # -------------------------------------------------------
     # KS4 specific parameters -- these are the default values
     # -------------------------------------------------------
-    ks4_duplicate_spike_bins = 15
+    ks4_duplicate_spike_ms = 0.25
     ks4_min_template_size_um = 10
 
     # If running KS20_for_preprocessed_data:
@@ -191,12 +190,6 @@ def main(args: dict = None):
     # ----------------------
     c_Waves_snr_um = 160
 
-    # -------------------------------------------------------
-    # KS4 specific parameters -- these are the default values
-    # -------------------------------------------------------
-    ks4_duplicate_spike_ms = 0.25
-    ks4_min_template_size_um = 10
-
     # ----------------------
     # psth_events parameters
     # ----------------------
@@ -204,7 +197,7 @@ def main(args: dict = None):
     # events that should be exported with the phy output for PSTH plots
     # This funciton now happens in TPrime
     # If not using set to an empty string
-    event_ex_param_str = ""  # "xd=0,0,-1,1,50"
+    event_ex_param_str = "xd=0,0,-1,1,50"
 
     # -----------------
     # TPrime parameters
@@ -243,17 +236,6 @@ def main(args: dict = None):
     # End of user input
     # -----------------------
     # -----------------------
-
-    if (
-        ks_ver in ["2.0", "2.5", "3.0"]
-        and "kilosort_helper" not in modules
-        and "ks4_helper" in modules
-    ):
-        print("For MATLAB versions of KS, run kilosort_helper module")
-        sys.exit()
-    if ks_ver == "4" and "ks4_helper" not in modules and "kilosort_helper" in modules:
-        print("For kilsort 4, run ks4_helper module")
-        sys.exit()
 
     # delete the existing CatGT.log
     try:
@@ -399,11 +381,11 @@ def main(args: dict = None):
             fileName = run_str + "_tcat.imec" + prb + ".ap.bin"
             continuous_file = os.path.join(data_dir, fileName)
 
-            if not os.path.exists(continuous_file):
+            if not os.path.exists(continuous_file) and not run_CatGT:
                 run_folder = run_str
                 prb_folder = run_str + "_imec" + prb
                 data_dir = os.path.join(npx_directory, run_folder, prb_folder)
-                fileName = f"{run_str}_t0.imec{prb}.ap.bin"
+                fileName = f"{run_str}_t{first_trig}.imec{prb}.ap.bin"
                 continuous_file = os.path.join(data_dir, fileName)
 
             data_directory.append(data_dir)
