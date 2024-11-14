@@ -1,4 +1,5 @@
 import fnmatch
+import json
 import os
 import shutil
 import subprocess
@@ -7,11 +8,12 @@ import time
 from pathlib import Path
 
 import numpy as np
-from argschema import ArgSchemaParser
 
+from ecephys_spike_sorting.modules.utils import ObjectEncoder
 from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
 
 from ...common.utils import catGT_ex_params_from_str
+from ._schemas import TprimeSchema
 
 
 def call_TPrime(args):
@@ -447,21 +449,19 @@ def create_PSTH_events(all_list, out_list, prbDir_list, extract_str, sort_name):
 
 
 def main():
-
-    from ._schemas import InputParameters, OutputParameters
-
     """Main entry point:"""
-    mod = ArgSchemaParser(
-        schema_type=InputParameters, output_schema_type=OutputParameters
-    )
+    input_json_index = sys.argv.index("--input_json") + 1
+    with open(sys.argv[input_json_index]) as f:
+        input_json = json.load(f)
+    output_json_index = sys.argv.index("--output_json") + 1
+    output_json = sys.argv[output_json_index]
+    args = TprimeSchema().load({"input": input_json, "output": {}})
 
-    output = call_TPrime(mod.args)
+    output = call_TPrime(args["input"])
 
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        print(mod.get_output_json(output))
+    output.update({"input_parameters": args["input"]})
+    with open(output_json, "w") as f:
+        json.dump(output, f, indent=2, cls=ObjectEncoder)
 
 
 if __name__ == "__main__":

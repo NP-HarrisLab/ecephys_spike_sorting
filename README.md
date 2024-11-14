@@ -168,10 +168,6 @@ Next install ecephys. To force the correct versions of some components, they mus
 
 ```shell
 pip install -e .
-pip uninstall argschema
-pip install argschema==1.17.5
-pip uninstall marshmallow
-pip install marshmallow==2.19.2
 pip install h5py
 pip install phylib
 ```
@@ -214,10 +210,6 @@ Next install ecephys. To force the correct versions of some components, they mus
 
 ```shell
 pip install -e .
-pip uninstall argschema
-pip install argschema==1.17.5
-pip uninstall marshmallow
-pip install marshmallow==2.19.2
 pip install h5py
 ```
 
@@ -264,7 +256,7 @@ NOTE: The pipeline is now compatible with the latest CatGT. If you are updating 
 
 ### Edit parameters for your system and runs
 
-Parameters are set in two files. Values that are constant across runs—like paths to code, parameters for sorting, etc – are set in **create_input_json.py**. Parameters that need to be set per run (run names, which triggers and probes to process…) are set in script files.
+Parameters are set in two files. Values that are constant across runsï¿½like paths to code, parameters for sorting, etc ï¿½ are set in **create_input_json.py**. Parameters that need to be set per run (run names, which triggers and probes to processï¿½) are set in script files.
 
 In **create_input_json.py**, be sure to set these paths and parameters for your system:
 

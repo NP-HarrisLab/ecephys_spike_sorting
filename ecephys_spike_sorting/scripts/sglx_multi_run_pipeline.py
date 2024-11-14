@@ -3,10 +3,17 @@ import os
 import subprocess
 import sys
 
-try:
-    from create_input_json import createInputJson  # type: ignore
-    from helpers import SpikeGLX_utils, log_from_json, run_one_probe  # type: ignore
+from marshmallow import EXCLUDE
 
+try:
+    from ecephys_spike_sorting.scripts.create_input_json import (
+        createInputJson,  # type: ignore
+    )
+    from ecephys_spike_sorting.scripts.helpers import (  # type: ignore
+        SpikeGLX_utils,
+        log_from_json,
+        run_one_probe,
+    )
     from ecephys_spike_sorting.scripts.schemas import SglxMultiRunPipelineParams
 except ModuleNotFoundError:
     from .create_input_json import createInputJson
@@ -26,7 +33,7 @@ except ModuleNotFoundError:
 
 
 def main(args: dict = None):
-    schema = SglxMultiRunPipelineParams()
+    schema = SglxMultiRunPipelineParams(unknown=EXCLUDE)
     params = schema.load(args)
     if type(params) != dict:
         params = params._asdict()["data"]

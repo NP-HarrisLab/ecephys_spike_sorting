@@ -30,7 +30,6 @@ setup(
         "pandas",
         "GitPython",
         "pillow",
-        "argschema",
         "xmljson",
         "xarray",
         "scikit-learn",

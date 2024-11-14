@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -6,11 +7,11 @@ import time
 from pathlib import Path
 
 import numpy as np
-from argschema import ArgSchemaParser
 
+from ecephys_spike_sorting.modules.utils import ObjectEncoder
 from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
 
-from ...common.utils import get_repo_commit_date_and_hash, read_probe_json, rms
+from ._schemas import CatgtSchema
 
 
 def run_CatGT(args):
@@ -167,21 +168,19 @@ def ParseProbeStr(probe_string):
 
 
 def main():
-
-    from ._schemas import InputParameters, OutputParameters
-
     """Main entry point:"""
-    mod = ArgSchemaParser(
-        schema_type=InputParameters, output_schema_type=OutputParameters
-    )
+    input_json_index = sys.argv.index("--input_json") + 1
+    with open(sys.argv[input_json_index]) as f:
+        input_json = json.load(f)
+    output_json_index = sys.argv.index("--output_json") + 1
+    output_json = sys.argv[output_json_index]
+    args = CatgtSchema().load({"input": input_json, "output": {}})
 
-    output = run_CatGT(mod.args)
+    output = run_CatGT(args["input"])
 
-    output.update({"input_parameters": mod.args})
-    if "output_json" in mod.args:
-        mod.output(output, indent=2)
-    else:
-        print(mod.get_output_json(output))
+    output.update({"input_parameters": args["input"]})
+    with open(output_json, "w") as f:
+        json.dump(output, f, indent=2, cls=ObjectEncoder)
 
 
 if __name__ == "__main__":

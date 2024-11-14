@@ -19,14 +19,6 @@
         ]
     },
     "default": {
-        "argschema": {
-            "hashes": [
-                "sha256:5ae46a75c30688e838727bb086b2edd61aa7e41dd901bef22b63badb83f9a0b8",
-                "sha256:5b9d0bbc2b35ecb14f7bc608a45de8199c40915ed55ed167e085a6b9f40821a0"
-            ],
-            "index": "pypi",
-            "version": "==1.17.5"
-        },
         "certifi": {
             "hashes": [
                 "sha256:9b469f3a900bf28dc19b8cfbf8019bf47f7fdd1a65a1d4ffb98fc14166beb4d1",
