@@ -85,3 +85,6 @@ target/
 
 # json files
 json_files/
+
+# create_input_json.py
+ecephys_spike_sorting/scripts/create_input_json.py
