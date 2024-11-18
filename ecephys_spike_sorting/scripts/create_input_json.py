@@ -14,7 +14,7 @@ if sys.platform == "linux":
 import numpy as np
 
 try:
-    from helpers import SpikeGLX_utils
+    from ecephys_spike_sorting.scripts.helpers import SpikeGLX_utils
 except ModuleNotFoundError:
     from .helpers import SpikeGLX_utils
 

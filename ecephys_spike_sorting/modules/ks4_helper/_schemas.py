@@ -30,7 +30,7 @@ class ks4_params(Schema):
         help="number of blocks used to segment the probe when tracking drift, 0 == do not track, 1 == rigid, > 1 == non-rigid",
     )
     sig_interp = Float(
-        required=True,
+        required=False,
         missing=20.0,
         help="sigma for the Gaussian interpolation in drift correction um)",
     )
