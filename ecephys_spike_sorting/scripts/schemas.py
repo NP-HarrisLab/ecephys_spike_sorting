@@ -137,3 +137,29 @@ class SglxMultiRunPipelineParams(Schema):
     run_quality_metrics = Boolean(
         required=False, description="Run Quality Metrics module", missing=True
     )
+    startsecs = Float(
+        required=False,
+        description="Start time for input stream in seconds",
+        missing=None,
+    )
+    maxsecs = Float(
+        required=False,
+        description="Maximum time for input stream in seconds",
+        missing=None,
+    )
+    supercat = Boolean(
+        required=False,
+        description="Run supercat module",
+        missing=False,
+    )
+    supercat_folders = List(
+        String,
+        required=False,
+        description="List of folders to supercat",
+        missing=[],
+    )
+    trim_edges = Boolean(
+        required=False,
+        description="Trim edges",
+        missing=False,
+    )
