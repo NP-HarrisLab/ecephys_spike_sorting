@@ -38,6 +38,19 @@ def main(args: dict = None):
     if type(params) != dict:
         params = params._asdict()["data"]
 
+    if not any(
+        [
+            params["run_CatGT"],
+            params["runTPrime"],
+            params["run_kilosort"],
+            params["run_kilosort_postprocessing"],
+            params["run_noise_templates"],
+            params["run_mean_waveforms"],
+            params["run_quality_metrics"],
+        ]
+    ):
+        return
+
     # ks_ver  sets up the output tag and threshold values.
     # To run a specific MATLAB KS, make sure to set up the kilosort_repository in
     # create_input_json; in the module list, call 'kilosort helper'
@@ -152,9 +165,35 @@ def main(args: dict = None):
     # Note 2: this command line includes specification of edge extraction
     # see CatGT readme for details
     # these parameters will be used for all runs
-    catGT_cmd_string = "-prb_fld -out_prb_fld -apfilter=butter,12,300,10000 -lffilter=butter,12,1,500 -gfix=0.4,0.10,0.02 "
+    if params["supercat"]:
+        catGT_cmd_string = "-supercat="
+        for folder in params["supercat_folders"]:
+            # check if folder is basename
+            catGT_cmd_string += (
+                "{" + npx_directory + "," + os.path.basename(folder) + "}"
+            )
+        if params["trim_edges"]:
+            catGT_cmd_string += " -trim_edges"
+        catGT_cmd_string += " -prb_fld -out_prb_fld"
+
+    else:
+        catGT_cmd_string = "-prb_fld -out_prb_fld -apfilter=butter,12,300,10000 -lffilter=butter,12,1,500 -gfix=0.4,0.10,0.02"
+        if params["startsecs"]:
+            catGT_cmd_string += f" -startsecs={params['startsecs']}"
+        if params["maxsecs"]:
+            catGT_cmd_string += f" -maxsecs={params['maxsecs']}"
 
     ni_present = params["ni_present"]
+    # Extractors:
+    # xa: Finds positive pulses in any analog channel | xd: Positive pulses in any digital channel
+    # xia: inverted pulses in any analog channel | xid: inverted pulses in any digital channel
+    # bf: Decodes positive bitfields in any digital channel
+    # js (stream-type): 0 for NI
+    # ip (stream-index): 0 for NI (only one stream)
+    # word: zero-based channel index. -1 selects last word
+    # thresh 1 & 2: V threshold for extraction. If do not need thresh 2 then make it closer to baseline than thresh 1
+    # millisec: amount of time to be above thresh 1 to be considered an event
+    # "-extractor: js,ip,word,thresh1(V),thresh2(V),millisec"
     ni_extract_string = params["ni_extract_string"]
 
     # --------------------------
@@ -352,6 +391,27 @@ def main(args: dict = None):
             metaName = run_str + "_t" + repr(first_trig) + ".imec" + prb + ".ap.meta"
             input_meta_fullpath = os.path.join(input_data_directory, metaName)
 
+            if params["supercat"]:
+                input_meta_fullpath = os.path.join(
+                    params["supercat_folders"][0], prb_folder, metaName
+                ).replace("t0", "tcat")
+                if not os.path.exists(input_meta_fullpath):
+                    input_meta_fullpath = input_meta_fullpath.replace(
+                        run_folder + "\\", "supercat_" + run_folder + "\\"
+                    )
+            else:
+                if not os.path.exists(input_meta_fullpath):
+                    input_meta_fullpath = input_meta_fullpath.replace(
+                        run_folder + "\\", "catgt_" + run_folder + "\\"
+                    )
+                    if not os.path.exists(input_meta_fullpath):
+                        input_meta_fullpath = os.path.join(
+                            input_data_directory, metaName
+                        ).replace("t0", "tcat")
+
+            assert os.path.exists(input_meta_fullpath), "Meta file not found: " + repr(
+                input_meta_fullpath
+            )
             print(input_meta_fullpath)
 
             info = createInputJson(
@@ -382,7 +442,8 @@ def main(args: dict = None):
 
             # location of the binary created by CatGT, using -out_prb_fld
             run_str = spec[0] + "_g" + str(first_gate)
-            run_folder = "catgt_" + run_str
+            prefix = "supercat_" if params["supercat"] else "catgt_"
+            run_folder = prefix + run_str
             prb_folder = run_str + "_imec" + prb
             data_dir = os.path.join(catGT_dest, run_folder, prb_folder)
             fileName = run_str + "_tcat.imec" + prb + ".ap.bin"
@@ -401,12 +462,11 @@ def main(args: dict = None):
             # kilosort_postprocessing and noise_templates moduules alter the files
             # that are input to phy. If using these modules, keep a copy of the
             # original phy output
+            kilosort_output_dir = os.path.join(data_directory[i], outputName)
             if ("kilosort_postprocessing" in modules) or ("noise_templates" in modules):
                 ks_make_copy = True
             else:
                 ks_make_copy = False
-
-            kilosort_output_dir = os.path.join(data_directory[i], outputName)
 
             print(data_directory[i])
             print(continuous_file)
