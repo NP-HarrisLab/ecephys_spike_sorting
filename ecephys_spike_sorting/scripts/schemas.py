@@ -158,6 +158,11 @@ class SglxMultiRunPipelineParams(Schema):
         description="List of folders to supercat",
         missing=[],
     )
+    run_supercat = Boolean(
+        required=False,
+        description="Run supercat",
+        missing=False,
+    )
     trim_edges = Boolean(
         required=False,
         description="Trim edges",

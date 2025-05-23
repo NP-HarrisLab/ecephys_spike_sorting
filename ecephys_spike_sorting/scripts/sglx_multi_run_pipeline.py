@@ -165,7 +165,7 @@ def main(args: dict = None):
     # Note 2: this command line includes specification of edge extraction
     # see CatGT readme for details
     # these parameters will be used for all runs
-    if params["supercat"]:
+    if params["run_supercat"]:
         catGT_cmd_string = "-supercat="
         for folder in params["supercat_folders"]:
             # check if folder is basename
@@ -391,7 +391,8 @@ def main(args: dict = None):
             metaName = run_str + "_t" + repr(first_trig) + ".imec" + prb + ".ap.meta"
             input_meta_fullpath = os.path.join(input_data_directory, metaName)
 
-            if params["supercat"]:
+            # TODO can clean this up a bit
+            if params["run_supercat"]:
                 input_meta_fullpath = os.path.join(
                     params["supercat_folders"][0], prb_folder, metaName
                 ).replace("t0", "tcat")
@@ -405,10 +406,15 @@ def main(args: dict = None):
                         run_folder + "\\", "catgt_" + run_folder + "\\"
                     )
                     if not os.path.exists(input_meta_fullpath):
-                        input_meta_fullpath = os.path.join(
-                            input_data_directory, metaName
-                        ).replace("t0", "tcat")
-
+                        input_meta_fullpath = input_meta_fullpath.replace("t0", "tcat")
+                        if not os.path.exists(input_meta_fullpath):
+                            input_meta_fullpath = input_meta_fullpath.replace(
+                                "catgt_", "supercat_"
+                            )
+                            if not os.path.exists(input_meta_fullpath):
+                                input_meta_fullpath = os.path.join(
+                                    input_data_directory, metaName
+                                ).replace("t0", "tcat")
             assert os.path.exists(input_meta_fullpath), "Meta file not found: " + repr(
                 input_meta_fullpath
             )
