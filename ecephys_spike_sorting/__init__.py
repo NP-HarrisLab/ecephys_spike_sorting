@@ -1,1 +1,2 @@
 import ecephys_spike_sorting.scripts.sglx_multi_run_pipeline as sglx_pipeline
+import ecephys_spike_sorting.scripts.sglx_runlist_split_shanks_pipeline as sglx_nxt_pipeline

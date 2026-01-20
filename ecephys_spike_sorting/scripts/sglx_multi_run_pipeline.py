@@ -130,7 +130,7 @@ def main(args: dict = None):
             params["gate_index"],
             params["triggers"],
             params["probes"],
-            ["cortex", "thalamus", "thalamus"],
+            ["cortex"] * len(params["probes"]),
         ]
     ]
 

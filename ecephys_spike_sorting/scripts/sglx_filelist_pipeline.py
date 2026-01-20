@@ -18,14 +18,14 @@ from helpers import SpikeGLX_utils, run_one_probe
 # -------------------------------
 # Full path to log file, including file name
 # If this file exists, new run data is appended to it
-logFullPath = r"F:\pipeline_log.csv"
+logFullPath = r"D:\recording_data\concat\pipeline_output\pipeline_log.csv"
 
 # ks_ver  sets up the output tag and threshold values.
 # To run a specific MATLAB KS, make sure to set up the kilosort_repository in
 # create_input_json; in the module list, call 'kilosort helper'
 # To run KS4, use an anaconda install and call 'ks4_helper'
 
-ks_ver = "4"  # needs to be one of: '2.0', '2.5', '3.0', or '4'
+ks_ver = "2.5"  # needs to be one of: '2.0', '2.5', '3.0', or '4'
 ksTag_dict = {"2.0": "ks2", "2.5": "ks25", "3.0": "ks3", "4": "ks4"}
 ks_output_tag = ksTag_dict[ks_ver]
 
@@ -44,6 +44,7 @@ ksTh2_dict = {
     "cortex": "[10,4]",
     "medulla": "[10,4]",
     "thalamus": "[10,4]",
+    "striatum": "[10,4]"
 }
 # threshold values appropriate for KS3.0
 ksTh3_dict = {
@@ -74,7 +75,7 @@ else:
 
 recording_specs = [		
     
-                [r'Z:\KS4_test\SC026_080619_ex_g0_tcat.imec2.ap.bin',['thalamus']]
+                [r'D:\recording_data\concat\supercat_20240914_SD1_test_0900_g0\20240914_SD1_test_0900_g0_tcat.imec0.ap.bin',['striatum']]
 
 ]
 
@@ -123,14 +124,14 @@ c_Waves_snr_um = 160
 # ---------------
 # List of modules to run per probe; CatGT and TPrime are called once for each run.
 modules = [
-    "ks4_helper",
+    "kilosort_helper",
     "kilosort_postprocessing",
     #'noise_templates',
     "mean_waveforms",
     "quality_metrics",
 ]
 
-json_directory = r'Z:\KS4_test\ws_pipeline_out\ecephys_json'
+json_directory = r'D:\recording_data\concat\pipeline_output\json_files'
 
 
 # -----------------------
@@ -166,7 +167,7 @@ session_id = []
 data_directory = []
 output_dir = []
 
-kilosort_output_parent = r'Z:\KS4_test\ws_pipeline_out'
+kilosort_output_parent = r'D:\recording_data\concat\pipeline_output'
  
 for i, spec in enumerate(recording_specs):
 

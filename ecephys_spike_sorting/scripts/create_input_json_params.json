@@ -1,8 +1,8 @@
 {
-    "ecephys_directory": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\ecephys_spike_sorting\\ecephys_spike_sorting",
-    "kilosort_25_repository": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\Kilosort-2.5",
-    "npy_matlab_repository": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\npy-matlab",
-    "catGTPath": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\CatGT-win",
-    "tPrime_path": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\TPrime-win",
-    "cWaves_path": "C:\\Users\\tdeweese\\Documents\\SpikeSorting\\C_Waves-win"
+    "ecephys_directory": "C:\\Users\\alexc\\Desktop\\Utilities\\ecephys_spike_sorting\\ecephys_spike_sorting",
+    "kilosort_25_repository": "C:\\Kilosort-2.5.2",
+    "npy_matlab_repository": "C:\\Users\\alexc\\Desktop\\Utilities\\npy-matlab-master",
+    "catGTPath": "C:\\Users\\alexc\\Desktop\\Utilities\\CatGT-win-20251009",
+    "tPrime_path": "C:\\Users\\alexc\\Desktop\\Utilities\\TPrime-win-20251009",
+    "cWaves_path": "C:\\Users\\alexc\\Desktop\\Utilities\\C_Waves-win-20251009"
 }
